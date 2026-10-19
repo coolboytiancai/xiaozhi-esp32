@@ -2,10 +2,11 @@
  * MCP Server Implementation
  * Reference: https://modelcontextprotocol.io/specification/2024-11-05
  */
-
-#include "ebook_reader.h"
-#include "word_study.h"
-#include "pomodoro.h"
+extern "C" {
+#include "app/pomodoro.h"
+#include "app/word_study.h"
+#include "app/ebook_reader.h"
+}
 #include "mcp_server.h"
 #include <esp_app_desc.h>
 #include <esp_log.h>
