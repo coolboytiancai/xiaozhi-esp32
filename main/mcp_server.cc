@@ -3,9 +3,9 @@
  * Reference: https://modelcontextprotocol.io/specification/2024-11-05
  */
 
-#include "../components/app/ebook_reader.h"
-#include "../components/app/word_study.h"
-#include "../components/app/pomodoro.h"
+#include "ebook_reader.h"
+#include "word_study.h"
+#include "pomodoro.h"
 #include "mcp_server.h"
 #include <esp_app_desc.h>
 #include <esp_log.h>
