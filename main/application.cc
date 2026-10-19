@@ -1,3 +1,7 @@
+#include "components/app/ebook_reader.h"
+#include "components/app/word_study.h"
+#include "components/app/pomodoro.h"
+#include <cstring>
 #include "application.h"
 #include "assets.h"
 #include "assets/lang_config.h"
