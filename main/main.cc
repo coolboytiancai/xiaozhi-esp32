@@ -17,6 +17,9 @@
 extern "C" void app_main(void)
 {
     // Initialize NVS flash for WiFi configuration
+        ebook_reader_init();
+    word_study_init();
+    pomodoro_init();
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_LOGW(TAG, "Erasing NVS flash to fix corruption");
