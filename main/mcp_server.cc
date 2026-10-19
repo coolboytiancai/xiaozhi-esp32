@@ -24,7 +24,13 @@ extern "C" {
 #include "settings.h"
 
 #define TAG "MCP"
-
+#include "esp_timer.h"
+extern "C" {
+static void pomo_timer_cb(void* arg)
+{
+    pomodoro_tick();
+}
+}
 McpServer::McpServer() {}
 
 McpServer::~McpServer() = default;
@@ -83,7 +89,7 @@ void McpServer::AddCommonTools() {
             word_study_end();
             pomodoro_stop();
             ebook_reader_open("/spiffs/book.txt");
-            ebook_reader_render_page();
+            ebook_reader_refresh_screen();
             return ReturnValue::Ok("已经打开电子书");
         });
 
@@ -157,7 +163,7 @@ void McpServer::AddCommonTools() {
         [](const PropertyList& props) -> ReturnValue {
             ebook_reader_close();
             word_study_end();
-            pomodoro_start(25);
+           pomodoro_start(25*60,5*60); //25分钟专注，5分钟休息;
             return ReturnValue::Ok("25分钟番茄钟开始");
         });
 
@@ -168,6 +174,18 @@ void McpServer::AddCommonTools() {
             pomodoro_stop();
             return ReturnValue::Ok("番茄钟已停止");
         });
+            static esp_timer_handle_t pomo_timer = nullptr;
+    if (pomo_timer == nullptr)
+    {
+        esp_timer_create_args_t timer_cfg = {
+            .callback = pomo_timer_cb,
+            .name = "pomo_timer"
+        };
+        esp_err_t err = esp_timer_create(&timer_cfg, &pomo_timer);
+        if (err == ESP_OK)
+        {
+            esp_timer_start_periodic(pomo_timer, 1000000); //1秒一次
+        }
     }
 
 #ifdef HAVE_LVGL
