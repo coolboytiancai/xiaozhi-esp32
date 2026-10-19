@@ -3,6 +3,9 @@
  * Reference: https://modelcontextprotocol.io/specification/2024-11-05
  */
 
+#include "../components/app/ebook_reader.h"
+#include "../components/app/word_study.h"
+#include "../components/app/pomodoro.h"
 #include "mcp_server.h"
 #include <esp_app_desc.h>
 #include <esp_log.h>
@@ -69,6 +72,101 @@ void McpServer::AddCommonTools() {
                     backlight->SetBrightness(brightness, true);
                     return true;
                 });
+        auto& mcp = McpServer::GetInstance();
+
+    // 电子书工具
+    mcp.AddTool("open_ebook",
+        "用户说打开电子书时调用，唤醒墨水屏电子书阅读界面",
+        PropertyList({}),
+        [](const PropertyList& props) -> ReturnValue {
+            word_study_end();
+            pomodoro_stop();
+            ebook_reader_open("/spiffs/book.txt");
+            ebook_reader_render_page();
+            return ReturnValue::Ok("已经打开电子书");
+        });
+
+    mcp.AddTool("ebook_next_page",
+        "电子书翻下一页，用户说下一页调用",
+        PropertyList({}),
+        [](const PropertyList& props) -> ReturnValue {
+            if(ebook_reader_is_active()){
+                ebook_reader_next_page();
+                return ReturnValue::Ok("");
+            }else{
+                return ReturnValue::Ok("请先打开电子书");
+            }
+        });
+
+    mcp.AddTool("ebook_prev_page",
+        "电子书翻上一页，用户说上一页调用",
+        PropertyList({}),
+        [](const PropertyList& props) -> ReturnValue {
+            if(ebook_reader_is_active()){
+                ebook_reader_prev_page();
+                return ReturnValue::Ok("");
+            }else{
+                return ReturnValue::Ok("请先打开电子书");
+            }
+        });
+
+    mcp.AddTool("close_ebook",
+        "关闭墨水屏电子书，用户说关闭电子书调用",
+        PropertyList({}),
+        [](const PropertyList& props) -> ReturnValue {
+            ebook_reader_close();
+            return ReturnValue::Ok("电子书已关闭");
+        });
+
+    // 百词斩背单词模块
+    mcp.AddTool("start_wordstudy",
+        "开启背单词模式，用户说开始背单词调用",
+        PropertyList({}),
+        [](const PropertyList& props) -> ReturnValue {
+            ebook_reader_close();
+            pomodoro_stop();
+            word_study_start();
+            return ReturnValue::Ok("开始背单词");
+        });
+
+    mcp.AddTool("next_word",
+        "切换下一个单词，用户说下一个单词调用",
+        PropertyList({}),
+        [](const PropertyList& props) -> ReturnValue {
+            if(word_study_is_active()){
+                word_study_next();
+                return ReturnValue::Ok("");
+            }else{
+                return ReturnValue::Ok("请先开启背单词模式");
+            }
+        });
+
+    mcp.AddTool("stop_wordstudy",
+        "结束背单词，用户说结束背单词调用",
+        PropertyList({}),
+        [](const PropertyList& props) -> ReturnValue {
+            word_study_end();
+            return ReturnValue::Ok("背单词结束");
+        });
+
+    // 番茄钟模块
+    mcp.AddTool("start_pomodoro",
+        "启动25分钟番茄钟，用户说开始番茄钟调用",
+        PropertyList({}),
+        [](const PropertyList& props) -> ReturnValue {
+            ebook_reader_close();
+            word_study_end();
+            pomodoro_start(25);
+            return ReturnValue::Ok("25分钟番茄钟开始");
+        });
+
+    mcp.AddTool("stop_pomodoro",
+        "停止番茄钟，用户说停止番茄钟调用",
+        PropertyList({}),
+        [](const PropertyList& props) -> ReturnValue {
+            pomodoro_stop();
+            return ReturnValue::Ok("番茄钟已停止");
+        });
     }
 
 #ifdef HAVE_LVGL
