@@ -1,3 +1,7 @@
+#include "../components/app/ebook_reader.h"
+#include "../components/app/word_study.h"
+#include "../components/app/pomodoro.h"
+#include <cstring>
 #include "websocket_protocol.h"
 #include "application.h"
 #include "board.h"
