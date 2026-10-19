@@ -1,3 +1,6 @@
+#include "components/app/ebook_reader.h"
+#include "components/app/word_study.h"
+#include "components/app/pomodoro.h"
 #include <esp_log.h>
 #include <esp_err.h>
 #include <nvs.h>
